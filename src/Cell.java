@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 public class Cell
 {
 	// ----- static variables.... These belong to the class as a whole; all Cells have access to these individual variables.
-	public static final int CELL_SIZE = 100;
+	public static final int CELL_SIZE = 150;
 	private static Font cellFont = new Font("Times New Roman",Font.BOLD,CELL_SIZE*3/4);
 	private static Image[] colorImages; // these will be filled with the images in the following files.
 	private static String[] filenames = {"dongaroo.jpeg", "GreenChip.png", "PurpleChip.png", "RedChip.png", "YellowChip.png"};
@@ -50,6 +50,7 @@ public class Cell
 	public Cell(int inRow, int inCol)
 	{
 		this((int)(Math.random()*filenames.length));
+		setColorID(1);
 		y = inRow*CELL_SIZE;
 		x = inCol*CELL_SIZE;
 	}
