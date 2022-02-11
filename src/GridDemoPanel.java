@@ -13,6 +13,7 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	private ArrayList<Coords> xyValues;
 	public int xCoord;
 	public int yCoord;
+	public double j = 0;
 	public final static int NUM_ROWS = 3;
 	public final static int NUM_COLS = 3;
 	public GridDemoFrame myParent;
@@ -25,7 +26,6 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 		resetCells();
 		xyValues = new ArrayList();
 		getSequence();
-		System.out.println(xCoord+" "+yCoord);
 		theGrid[2][2].setDisplayMarker(true);
 		theGrid[xCoord][yCoord].setIsLive(true);
 		setBackground(Color.BLACK);
@@ -79,11 +79,6 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 		xyValues.add(new Coords(rand.nextInt(3), rand.nextInt(3)));
 		if (xyValues.size() < currentLevel){
 			xyValues.add(new Coords(rand.nextInt(3), rand.nextInt(3)));
-		}
-		for(int j = 0; j < currentLevel; j++){
-			Coords currentSquare = xyValues.get(j);
-			xCoord = currentSquare.getX();
-			yCoord = currentSquare.getY();
 		}
 		return xyValues;
 	}
@@ -195,8 +190,28 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	 */
 	public void animationStep(long millisecondsSinceLastStep)
 	{
-		theGrid[xCoord][yCoord].cycleColorIDBackward();
-		repaint();
+		if(j==currentLevel){
+			return;
+		}
+		if(j != (int) j){
+			Coords currentSquare = xyValues.get((int)j);
+			System.out.println(j);
+			xCoord = currentSquare.getX();
+			yCoord = currentSquare.getY();
+			theGrid[xCoord][yCoord].cycleColorIDBackward();
+			j += .5;
+			repaint();
+		}
+		else
+		{
+			Coords currentSquare = xyValues.get((int)j);
+			System.out.println(j);
+			xCoord = currentSquare.getX();
+			yCoord = currentSquare.getY();
+			theGrid[xCoord][yCoord].cycleColorIDBackward();
+			j+=.5;
+			repaint();
+		}
 	}
 	// ------------------------------- animation thread - internal class -------------------
 	public class AnimationThread implements Runnable
