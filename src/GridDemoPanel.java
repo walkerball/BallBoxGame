@@ -1,28 +1,33 @@
-import java.awt.Color;
-import java.awt.Graphics;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 {
 	private Cell[][] theGrid;
+	private ArrayList<Coords> xyValues;
+	public int xCoord;
+	public int yCoord;
 	public final static int NUM_ROWS = 3;
 	public final static int NUM_COLS = 3;
 	public GridDemoFrame myParent;
 	public int score;
+	public int currentLevel;
 	
 	public GridDemoPanel(GridDemoFrame parent)
 	{
 		super();
 		resetCells();
-		// theGrid[2][2].setMarker("A");//
-		// theGrid[2][2].setDisplayMarker(true);//
-		// theGrid[3][3].setIsLive(false);//
+		xyValues = new ArrayList();
+		getSequence();
+		System.out.println(xCoord+" "+yCoord);
+		theGrid[2][2].setDisplayMarker(true);
+		theGrid[xCoord][yCoord].setIsLive(true);
 		setBackground(Color.BLACK);
 		addMouseListener(this);
 		//parent.addKeyListener(this); // activate this if you wish to listen to the keyboard. 
@@ -68,7 +73,20 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 		
 	}
 	
-	
+	public ArrayList<Coords> getSequence(){
+		Random rand = new Random();
+		currentLevel = (2);
+		xyValues.add(new Coords(rand.nextInt(3), rand.nextInt(3)));
+		if (xyValues.size() < currentLevel){
+			xyValues.add(new Coords(rand.nextInt(3), rand.nextInt(3)));
+		}
+		for(int j = 0; j < currentLevel; j++){
+			Coords currentSquare = xyValues.get(j);
+			xCoord = currentSquare.getX();
+			yCoord = currentSquare.getY();
+		}
+		return xyValues;
+	}
 	
 	
 	/**
@@ -177,11 +195,7 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	 */
 	public void animationStep(long millisecondsSinceLastStep)
 	{
-
-		int randCol = ((int)(Math.random()*3));
-		int randRow = ((int)(Math.random()*3));
-		theGrid[randCol][randRow].setColorID(2);
-
+		theGrid[xCoord][yCoord].cycleColorIDBackward();
 		repaint();
 	}
 	// ------------------------------- animation thread - internal class -------------------
