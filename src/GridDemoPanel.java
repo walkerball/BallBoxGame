@@ -75,9 +75,9 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	
 	public ArrayList<Coords> getSequence(){
 		Random rand = new Random();
-		currentLevel = (2);
+		currentLevel = (15);
 		xyValues.add(new Coords(rand.nextInt(3), rand.nextInt(3)));
-		if (xyValues.size() < currentLevel){
+		while (xyValues.size() < currentLevel){
 			xyValues.add(new Coords(rand.nextInt(3), rand.nextInt(3)));
 		}
 		return xyValues;
