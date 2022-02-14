@@ -1,28 +1,33 @@
-import java.awt.Color;
-import java.awt.Graphics;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 {
 	private Cell[][] theGrid;
+	private ArrayList<Coords> xyValues;
+	public int xCoord;
+	public int yCoord;
+	public double j = 0;
 	public final static int NUM_ROWS = 3;
 	public final static int NUM_COLS = 3;
 	public GridDemoFrame myParent;
 	public int score;
+	public int currentLevel;
 	
 	public GridDemoPanel(GridDemoFrame parent)
 	{
 		super();
 		resetCells();
-		// theGrid[2][2].setMarker("A");//
-		// theGrid[2][2].setDisplayMarker(true);//
-		// theGrid[3][3].setIsLive(false);//
+		xyValues = new ArrayList();
+		getSequence();
+		theGrid[2][2].setDisplayMarker(true);
+		theGrid[xCoord][yCoord].setIsLive(true);
 		setBackground(Color.BLACK);
 		addMouseListener(this);
 		//parent.addKeyListener(this); // activate this if you wish to listen to the keyboard. 
@@ -68,7 +73,15 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 		
 	}
 	
-	
+	public ArrayList<Coords> getSequence(){
+		Random rand = new Random();
+		currentLevel = (15);
+		xyValues.add(new Coords(rand.nextInt(3), rand.nextInt(3)));
+		while (xyValues.size() < currentLevel){
+			xyValues.add(new Coords(rand.nextInt(3), rand.nextInt(3)));
+		}
+		return xyValues;
+	}
 	
 	
 	/**
@@ -177,12 +190,28 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	 */
 	public void animationStep(long millisecondsSinceLastStep)
 	{
-
-		int randCol = ((int)(Math.random()*3));
-		int randRow = ((int)(Math.random()*3));
-		theGrid[randCol][randRow].setColorID(2);
-
-		repaint();
+		if(j==currentLevel){
+			return;
+		}
+		if(j != (int) j){
+			Coords currentSquare = xyValues.get((int)j);
+			System.out.println(j);
+			xCoord = currentSquare.getX();
+			yCoord = currentSquare.getY();
+			theGrid[xCoord][yCoord].cycleColorIDBackward();
+			j += .5;
+			repaint();
+		}
+		else
+		{
+			Coords currentSquare = xyValues.get((int)j);
+			System.out.println(j);
+			xCoord = currentSquare.getX();
+			yCoord = currentSquare.getY();
+			theGrid[xCoord][yCoord].cycleColorIDBackward();
+			j+=.5;
+			repaint();
+		}
 	}
 	// ------------------------------- animation thread - internal class -------------------
 	public class AnimationThread implements Runnable
