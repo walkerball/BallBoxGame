@@ -13,7 +13,6 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	private ArrayList<Coords> xyValues;
 	public int xCoord;
 	public int yCoord;
-	public double j = 0;
 	public final static int NUM_ROWS = 3;
 	public final static int NUM_COLS = 3;
 	public GridDemoFrame myParent;
@@ -22,10 +21,11 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	
 	public GridDemoPanel(GridDemoFrame parent)
 	{
+
 		super();
 		resetCells();
 		xyValues = new ArrayList();
-		getSequence();
+		currentLevel = 1;
 		theGrid[2][2].setDisplayMarker(true);
 		theGrid[xCoord][yCoord].setIsLive(true);
 		setBackground(Color.BLACK);
@@ -75,13 +75,14 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	
 	public ArrayList<Coords> getSequence(){
 		Random rand = new Random();
-		currentLevel = (15);
-		xyValues.add(new Coords(rand.nextInt(3), rand.nextInt(3)));
-		while (xyValues.size() < currentLevel){
 			xyValues.add(new Coords(rand.nextInt(3), rand.nextInt(3)));
-		}
-		return xyValues;
+			while (xyValues.size() < currentLevel){
+				xyValues.add(new Coords(rand.nextInt(3), rand.nextInt(3)));
+			}
+			return xyValues;
 	}
+
+
 	
 	
 	/**
@@ -180,16 +181,10 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 		Thread aniThread = new Thread( new AnimationThread(500)); // the number here is the number of milliseconds between steps.
 		aniThread.start();
 	}
-	
-	/**
-	 * Modify this method to do what you want to have happen periodically.
-	 * This method will be called on a regular basis, determined by the delay set in the thread.
-	 * Note: By default, this will NOT get called unless you uncomment the code in the GridDemoFrame's constructor
-	 * that creates a thread.
-	 *
-	 */
-	public void animationStep(long millisecondsSinceLastStep)
+
+	public void displayCurrentLevel()
 	{
+		int j = 0;
 		if(j==currentLevel){
 			return;
 		}
@@ -212,6 +207,20 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 			j+=.5;
 			repaint();
 		}
+	}
+	
+	/**
+	 * Modify this method to do what you want to have happen periodically.
+	 * This method will be called on a regular basis, determined by the delay set in the thread.
+	 * Note: By default, this will NOT get called unless you uncomment the code in the GridDemoFrame's constructor
+	 * that creates a thread.
+	 *
+	 */
+	public void animationStep(long millisecondsSinceLastStep)
+	{
+			getSequence();
+			displayCurrentLevel();
+			currentLevel+=1;
 	}
 	// ------------------------------- animation thread - internal class -------------------
 	public class AnimationThread implements Runnable
