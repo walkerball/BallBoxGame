@@ -37,7 +37,8 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 		theGrid[xCoord][yCoord].setIsLive(true);
 		setBackground(Color.BLACK);
 		addMouseListener(this);
-		//parent.addKeyListener(this); // activate this if you wish to listen to the keyboard. 
+		//parent.addKeyListener(this); // activate this if you wish to listen to the keyboard.
+		//test
 		myParent = parent;
 	}	
 	
