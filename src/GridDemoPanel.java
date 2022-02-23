@@ -18,6 +18,7 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	public GridDemoFrame myParent;
 	public int score;
 	public int currentLevel;
+	private long timeSinceLastChange;
 	
 	public GridDemoPanel(GridDemoFrame parent)
 	{
@@ -26,13 +27,14 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 		resetCells();
 		xyValues = new ArrayList();
 		currentLevel = 1;
-		theGrid[2][2].setDisplayMarker(true);
-		theGrid[xCoord][yCoord].setIsLive(true);
+		// theGrid[2][2].setDisplayMarker(true);//
+		theGrid[yCoord][xCoord].setIsLive(true);
 		setBackground(Color.BLACK);
 		addMouseListener(this);
 		//parent.addKeyListener(this); // activate this if you wish to listen to the keyboard. 
 		myParent = parent;
-	}	
+	}
+
 	
 	/**
 	 * makes a new board with random colors, completely filled in, and resets the score to zero.
@@ -73,13 +75,12 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 		
 	}
 	
-	public ArrayList<Coords> getSequence(){
+	public void getSequence(){
 		Random rand = new Random();
-			xyValues.add(new Coords(rand.nextInt(3), rand.nextInt(3)));
 			while (xyValues.size() < currentLevel){
 				xyValues.add(new Coords(rand.nextInt(3), rand.nextInt(3)));
 			}
-			return xyValues;
+		System.out.println(""+xyValues);
 	}
 
 
@@ -182,32 +183,29 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 		aniThread.start();
 	}
 
-	public void displayCurrentLevel()
-	{
-		int j = 0;
-		if(j==currentLevel){
-			return;
+	public void displayCurrentLevel(long milliSinceLastStep) {
+		    double j = 0;
+		    timeSinceLastChange += milliSinceLastStep;
+			if (j != (int) j) {
+				Coords currentSquare = xyValues.get((int) j);
+				System.out.println(j);
+				xCoord = currentSquare.getX();
+				yCoord = currentSquare.getY();
+				theGrid[yCoord][xCoord].cycleColorIDBackward();
+				j += .5;
+				repaint();
+			} else {
+				Coords currentSquare = xyValues.get((int) j);
+				System.out.println(j);
+				xCoord = currentSquare.getX();
+				yCoord = currentSquare.getY();
+				theGrid[yCoord][xCoord].cycleColorIDBackward();
+				j += .5;
+				repaint();
+			}
 		}
-		if(j != (int) j){
-			Coords currentSquare = xyValues.get((int)j);
-			System.out.println(j);
-			xCoord = currentSquare.getX();
-			yCoord = currentSquare.getY();
-			theGrid[xCoord][yCoord].cycleColorIDBackward();
-			j += .5;
-			repaint();
-		}
-		else
-		{
-			Coords currentSquare = xyValues.get((int)j);
-			System.out.println(j);
-			xCoord = currentSquare.getX();
-			yCoord = currentSquare.getY();
-			theGrid[xCoord][yCoord].cycleColorIDBackward();
-			j+=.5;
-			repaint();
-		}
-	}
+
+
 	
 	/**
 	 * Modify this method to do what you want to have happen periodically.
@@ -218,8 +216,10 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	 */
 	public void animationStep(long millisecondsSinceLastStep)
 	{
+
 			getSequence();
-			displayCurrentLevel();
+			displayCurrentLevel(millisecondsSinceLastStep);
+			System.out.println("Level"+currentLevel+"complete");
 			currentLevel+=1;
 	}
 	// ------------------------------- animation thread - internal class -------------------
