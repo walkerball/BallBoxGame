@@ -11,21 +11,28 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 {
 	private Cell[][] theGrid;
 	private ArrayList<Coords> xyValues;
+	private int mode;
 	public int xCoord;
 	public int yCoord;
+	public int z;
+	public double j = 0;
 	public final static int NUM_ROWS = 3;
 	public final static int NUM_COLS = 3;
+	public static final int MODE_ANIMATION = 0;
+	public static final int MODE_CLICK = 1;
 	public GridDemoFrame myParent;
 	public int score;
 	public int currentLevel;
 	
 	public GridDemoPanel(GridDemoFrame parent)
 	{
-
 		super();
 		resetCells();
 		xyValues = new ArrayList();
+		z = 0;
 		currentLevel = 1;
+		getSequence();
+		mode = MODE_ANIMATION;
 		theGrid[2][2].setDisplayMarker(true);
 		theGrid[xCoord][yCoord].setIsLive(true);
 		setBackground(Color.BLACK);
@@ -37,6 +44,7 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	/**
 	 * makes a new board with random colors, completely filled in, and resets the score to zero.
 	 */
+
 	public void resetCells()
 	{
 		theGrid = new Cell[NUM_ROWS][NUM_COLS];
@@ -59,30 +67,45 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	 * @param row
 	 * @param col
 	 */
+
 	public void userClickedCell(int row, int col)
 	{
-		
-		System.out.println("("+row+", "+col+")");
-		if (!theGrid[row][col].isLive())
+		if(mode == MODE_CLICK){
+			System.out.println("("+row+", "+col+")");
+			if (!theGrid[row][col].isLive())
+				return;
+			score += theGrid[row][col].getColorID();
+			myParent.updateScore(score);
+			Coords firefox = xyValues.get(z);
+			if(z<xyValues.size()){
+				if (firefox.getX() == row && firefox.getY() == col ){
+					z++;
+				}
+				else {
+					System.out.println("Game Over");
+					System.out.println(firefox.getX() + " " + firefox.getY());
+				}
+			}
+			else{
+				z = 0;
+				currentLevel++;
+				mode = MODE_ANIMATION;
+			}
+			theGrid[row][col].cycleColorIDForward();
+			repaint();
+		}
+		else{
 			return;
-		score += theGrid[row][col].getColorID();
-		myParent.updateScore(score);
-		
-		theGrid[row][col].cycleColorIDForward();
-		repaint();
-		
+		}
 	}
 	
 	public ArrayList<Coords> getSequence(){
 		Random rand = new Random();
+		while (xyValues.size() < currentLevel){
 			xyValues.add(new Coords(rand.nextInt(3), rand.nextInt(3)));
-			while (xyValues.size() < currentLevel){
-				xyValues.add(new Coords(rand.nextInt(3), rand.nextInt(3)));
-			}
-			return xyValues;
+		}
+		return xyValues;
 	}
-
-
 	
 	
 	/**
@@ -181,33 +204,6 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 		Thread aniThread = new Thread( new AnimationThread(500)); // the number here is the number of milliseconds between steps.
 		aniThread.start();
 	}
-
-	public void displayCurrentLevel()
-	{
-		int j = 0;
-		if(j==currentLevel){
-			return;
-		}
-		if(j != (int) j){
-			Coords currentSquare = xyValues.get((int)j);
-			System.out.println(j);
-			xCoord = currentSquare.getX();
-			yCoord = currentSquare.getY();
-			theGrid[xCoord][yCoord].cycleColorIDBackward();
-			j += .5;
-			repaint();
-		}
-		else
-		{
-			Coords currentSquare = xyValues.get((int)j);
-			System.out.println(j);
-			xCoord = currentSquare.getX();
-			yCoord = currentSquare.getY();
-			theGrid[xCoord][yCoord].cycleColorIDBackward();
-			j+=.5;
-			repaint();
-		}
-	}
 	
 	/**
 	 * Modify this method to do what you want to have happen periodically.
@@ -218,11 +214,35 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	 */
 	public void animationStep(long millisecondsSinceLastStep)
 	{
-			getSequence();
-			displayCurrentLevel();
-			currentLevel+=1;
+		if(mode == MODE_ANIMATION) {
+			if (j == currentLevel) {
+				mode = MODE_CLICK;
+			} else {
+				if (j != (int) j) {
+					Coords currentSquare = xyValues.get((int) j);
+					System.out.println(j);
+					xCoord = currentSquare.getX();
+					yCoord = currentSquare.getY();
+					theGrid[xCoord][yCoord].cycleColorIDBackward();
+					j += .5;
+					repaint();
+				} else {
+					Coords currentSquare = xyValues.get((int) j);
+					System.out.println(j);
+					xCoord = currentSquare.getX();
+					yCoord = currentSquare.getY();
+					theGrid[xCoord][yCoord].cycleColorIDBackward();
+					j += .5;
+					repaint();
+				}
+			}
+		}
+		else
+		{
+			return;
+		}
 	}
-	// ------------------------------- animation thread - internal class -------------------
+	// ------------------------------ animation thread - internal class -------------------
 	public class AnimationThread implements Runnable
 	{
 		long start;
