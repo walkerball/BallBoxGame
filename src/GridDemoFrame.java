@@ -4,12 +4,10 @@ import javax.swing.Box;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-public class GridDemoFrame extends JFrame
-{
+public class GridDemoFrame extends JFrame {
 	GridDemoPanel thePanel;
 	JLabel scoreLabel, messageLabel;
-	public GridDemoFrame()
-	{
+	public GridDemoFrame() {
 		super("Grid Demo");
 		
 		setSize(600,600+24+16);
@@ -33,14 +31,12 @@ public class GridDemoFrame extends JFrame
 		thePanel.initiateAnimationLoop(); // uncomment this line if your program uses animation.
 	}
 	
-	public void updateMessage(String message)
-	{
+	public void updateMessage(String message) {
 		messageLabel.setText(message);
 		messageLabel.repaint();
 	}
 	
-	public void updateScore(int score)
-	{
+	public void updateScore(int score) {
 		scoreLabel.setText("Score: "+score);
 		scoreLabel.repaint();
 	}

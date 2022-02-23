@@ -2,8 +2,7 @@
 public class Coords {
     private int X, Y;
 
-    public Coords(int X, int Y)
-    {
+    public Coords(int X, int Y) {
         this.X = X;
         this.Y = Y;
     }

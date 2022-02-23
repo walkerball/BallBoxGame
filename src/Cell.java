@@ -7,8 +7,7 @@ import java.awt.Image;
 
 import javax.swing.ImageIcon;
 
-public class Cell
-{
+public class Cell {
 	// ----- static variables.... These belong to the class as a whole; all Cells have access to these individual variables.
 	public static final int CELL_SIZE = 150;
 	private static Font cellFont = new Font("Times New Roman",Font.BOLD,CELL_SIZE*3/4);
@@ -23,8 +22,7 @@ public class Cell
 	private boolean isLive; // whether the cell should appear at all.
 	
 	//=====================  CONSTRUCTORS =============================
-	public Cell()
-	{
+	public Cell() {
 		colorID = 1;
 		isLive = true;
 		// The following is a sneaky trick I am using to initialize a static variable - the first constructor that 
@@ -33,30 +31,26 @@ public class Cell
 		// have to load the images.
 		marker = "";
 		displayMarker = false;
-		if (colorImages == null)
-		{
+		if (colorImages == null) {
 			colorImages = new Image[filenames.length];
 			for (int i =0; i<filenames.length; i++)
 				colorImages[i] = (new ImageIcon(filenames[i])).getImage();
 		}
 	}
 	
-	public Cell(int cid)
-	{
+	public Cell(int cid) {
 		this();
 		colorID = cid;
 	}
 	
-	public Cell(int inRow, int inCol)
-	{
+	public Cell(int inRow, int inCol) {
 		this((int)(Math.random()*filenames.length));
 		setColorID(1);
 		y = inRow*CELL_SIZE;
 		x = inCol*CELL_SIZE;
 	}
 	
-	public Cell(int cid, int inRow, int inCol, String inMarker, boolean disp)
-	{
+	public Cell(int cid, int inRow, int inCol, String inMarker, boolean disp) {
 		this(inRow,inCol);
 		colorID = cid;
 		marker = inMarker;
@@ -137,8 +131,7 @@ public class Cell
 		isLive = b;
 	}
 	// =============================   DRAW SELF ================================
-	public void drawSelf(Graphics g)
-	{
+	public void drawSelf(Graphics g) {
 		if (!isLive)
 			return;
 		Graphics2D g2 = (Graphics2D)g;
@@ -152,8 +145,7 @@ public class Cell
 		g2.setStroke(new BasicStroke(2));
 		g2.drawRoundRect(x+1, y+1, CELL_SIZE-4, CELL_SIZE-4, 8, 8);
 		   
-		if (displayMarker)
-		{
+		if (displayMarker) {
 			g2.setFont(cellFont);
 			g2.setColor(Color.WHITE);
 			g2.drawString(marker, x+CELL_SIZE/2-6, y+CELL_SIZE/2+7);  //You'll likely want to tinker with these numbers.
@@ -164,8 +156,7 @@ public class Cell
 	
 	}
 // ===================================  OVERRIDDEN OBJECT METHODS ==============================
-	public boolean equals(Object other)
-	{
+	public boolean equals(Object other) {
 		if (other instanceof Cell)
 			if ((((Cell) other).colorID == this.colorID) && 
 			   (((Cell) other).marker   == this.marker))
@@ -179,8 +170,7 @@ public class Cell
 	}
 	
 	// a good habit for us to get into, but we probably won't need this for the current project.
-	public int hashCode()
-	{
+	public int hashCode() {
 		int result = colorID * 137;
 		if (marker!=null) result += marker.hashCode();
 		return result;
