@@ -1,8 +1,6 @@
 import java.awt.BorderLayout;
 
-import javax.swing.Box;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.*;
 
 public class GridDemoFrame extends JFrame {
 	GridDemoPanel thePanel;
