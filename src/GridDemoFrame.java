@@ -12,7 +12,7 @@ public class GridDemoFrame extends JFrame {
 		
 		this.getContentPane().setLayout(new BorderLayout());
 		thePanel = new GridDemoPanel(this);
-		scoreLabel = new JLabel("Score: 0");
+		scoreLabel = new JLabel("Level: 1 Score: 0");
 		messageLabel = new JLabel("");
 		Box southPanel = Box.createHorizontalBox();
 		
@@ -34,8 +34,8 @@ public class GridDemoFrame extends JFrame {
 		messageLabel.repaint();
 	}
 	
-	public void updateScore(int score) {
-		scoreLabel.setText("Score: "+score);
+	public void updateScore(int level, int score) {
+		scoreLabel.setText("Level: " + level + " Score: "+ score);
 		scoreLabel.repaint();
 	}
 }

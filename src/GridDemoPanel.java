@@ -23,10 +23,13 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	public GridDemoFrame myParent;
 	public int score;
 	public int currentLevel;
+
+	public Score theScore;
 	
 	public GridDemoPanel(GridDemoFrame parent)
 	{
 		super();
+		theScore = new Score(1,0);
 		resetCells();
 		xyValues = new ArrayList();
 		z = 0;
@@ -53,6 +56,7 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 			for (int c=0; c<NUM_COLS; c++)
 				theGrid[r][c] = new Cell(r,c);
 		score = 0;
+		theScore.resetScore();
 	}
 	
 	public void paintComponent(Graphics g)
@@ -76,7 +80,9 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 			if (!theGrid[row][col].isLive())
 				return;
 			score += theGrid[row][col].getColorID();
-			myParent.updateScore(score);
+
+			theScore.addPoints(theGrid[row][col].getColorID());
+			myParent.updateScore(theScore.getLevel(), theScore.getPoints());
 			Coords firefox = xyValues.get(z);
 			if(z<xyValues.size()){
 				if (firefox.getX() == row && firefox.getY() == col ){
@@ -90,6 +96,7 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 			else{
 				z = 0;
 				currentLevel++;
+				theScore.addLevel(1);
 				mode = MODE_ANIMATION;
 			}
 			theGrid[row][col].cycleColorIDForward();
@@ -102,7 +109,7 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	
 	public ArrayList<Coords> getSequence(){
 		Random rand = new Random();
-		while (xyValues.size() < currentLevel){
+		while (xyValues.size() < theScore.getLevel()){
 			xyValues.add(new Coords(rand.nextInt(3), rand.nextInt(3)));
 		}
 		return xyValues;
@@ -216,7 +223,7 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	public void animationStep(long millisecondsSinceLastStep)
 	{
 		if(mode == MODE_ANIMATION) {
-			if (j == currentLevel) {
+			if (j == theScore.getLevel()) {
 				mode = MODE_CLICK;
 			} else {
 				if (j != (int) j) {
