@@ -10,7 +10,7 @@ public class Score {
 
     public Score()
     {
-        this.Level = 1;
+        this.Level = 1; 
         this.Points = 0;
     }
 
@@ -46,7 +46,6 @@ public class Score {
 
     public void resetScore()
     {
-        this.Level = 1;
         this.Points = 0;
     }
 }
