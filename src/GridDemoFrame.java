@@ -33,9 +33,13 @@ public class GridDemoFrame extends JFrame {
 		messageLabel.setText(message);
 		messageLabel.repaint();
 	}
-	
-	public void updateScore(int level, int score) {
-		scoreLabel.setText("Level: " + level + " Score: "+ score);
+
+	public void updateScore(int level, int score, boolean mode) {
+		if (mode == false)
+			scoreLabel.setText("Level: " + level + " Score: "+ score);
+		else
+			scoreLabel.setText("Level: " + level + " Score: "+ score + "   GAME OVER");
+
 		scoreLabel.repaint();
 	}
 }

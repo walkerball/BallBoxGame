@@ -14,37 +14,50 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	private int mode;
 	public int xCoord;
 	public int yCoord;
-	public int z;
-	public double j = 0;
+	public int resetxCoord=0;
+	public int resetyCoord=0;
+	public int clicked=0;
+	public int sequence;
+	public double flipimage = 0;
+	public final static int MAX_LEVELS = 3;
+
 	public final static int NUM_ROWS = 3;
 	public final static int NUM_COLS = 3;
 	public static final int MODE_ANIMATION = 0;
 	public static final int MODE_CLICK = 1;
+	public static final int MODE_CLICK_FINISH = 2;
+	public static final int MODE_FINISHED_SEQUENCE = 3;
+	public static final int MODE_STARTNEXT_SEQUENCE = 4;
+	public static final int MODE_GAME_OVER = 5;
+
+
+
 	public GridDemoFrame myParent;
-	public int score;
 	public int currentLevel;
 
 	public Score theScore;
-	
+
 	public GridDemoPanel(GridDemoFrame parent)
 	{
 		super();
-		theScore = new Score(1,0);
+		currentLevel = 1;
+		theScore = new Score(currentLevel,0);
 		resetCells();
 		xyValues = new ArrayList();
-		z = 0;
-		currentLevel = 1;
+		sequence = 0;
 		getSequence();
 		mode = MODE_ANIMATION;
 		theGrid[2][2].setDisplayMarker(true);
+		xCoord = 0;
+		yCoord = 0;
 		theGrid[xCoord][yCoord].setIsLive(true);
 		setBackground(Color.BLACK);
 		addMouseListener(this);
 		//parent.addKeyListener(this); // activate this if you wish to listen to the keyboard.
 		//test
 		myParent = parent;
-	}	
-	
+	}
+
 	/**
 	 * makes a new board with random colors, completely filled in, and resets the score to zero.
 	 */
@@ -55,10 +68,17 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 		for (int r =0; r<NUM_ROWS; r++)
 			for (int c=0; c<NUM_COLS; c++)
 				theGrid[r][c] = new Cell(r,c);
-		score = 0;
+
 		theScore.resetScore();
 	}
-	
+
+	public void resetGrid()
+	{
+		for (int r =0; r<NUM_ROWS; r++)
+			for (int c=0; c<NUM_COLS; c++)
+				theGrid[r][c].setColorID(1);;
+	}
+
 	public void paintComponent(Graphics g)
 	{
 		super.paintComponent(g);
@@ -66,7 +86,7 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 			for (int c=0; c<NUM_COLS; c++)
 				theGrid[r][c].drawSelf(g);
 	}
-	
+
 	/**
 	 * the mouse listener has detected a click, and it has happened on the cell in theGrid at row, col
 	 * @param row
@@ -76,55 +96,83 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	public void userClickedCell(int row, int col)
 	{
 		if(mode == MODE_CLICK){
-			System.out.println("("+row+", "+col+")");
-			if (!theGrid[row][col].isLive())
-				return;
-			score += theGrid[row][col].getColorID();
+			resetxCoord = row;
+			resetyCoord = col;
 
-			theScore.addPoints(theGrid[row][col].getColorID());
-			myParent.updateScore(theScore.getLevel(), theScore.getPoints());
-			Coords firefox = xyValues.get(z);
-			if(z<xyValues.size()){
+			System.out.println(theGrid[row][col].getColorID() + ": ("+row+", "+col+") - z:" + sequence + "xyValues.size():" + xyValues.size());
+			if (!theGrid[row][col].isLive()) {
+				System.out.println("not Live?");
+
+				return;
+			}
+
+			Coords firefox = xyValues.get(sequence);
+			if(sequence<xyValues.size()){
+				// check to see if we hit the square in right order
 				if (firefox.getX() == row && firefox.getY() == col ){
-					z++;
+					sequence++;
+					theScore.addPoints(1);
+					myParent.updateScore(theScore.getLevel(), theScore.getPoints(), (mode == MODE_GAME_OVER));
 				}
 				else {
 					System.out.println("Game Over");
 					System.out.println(firefox.getX() + " " + firefox.getY());
+					mode = MODE_GAME_OVER;
+					myParent.updateScore(theScore.getLevel(), theScore.getPoints(), (mode == MODE_GAME_OVER));
+
 				}
 			}
-			else{
-				z = 0;
+
+			if(sequence>xyValues.size()-1){
+				theGrid[row][col].cycleColorIDForward();
+				//	clicked = 1;
+				repaint();
+
+				sequence = 0;
+				flipimage = 0;
 				currentLevel++;
 				theScore.addLevel(1);
-				mode = MODE_ANIMATION;
+				resetGrid();
+				getSequence();
+				mode = MODE_FINISHED_SEQUENCE;
+				repaint();
+				return;
 			}
+
 			theGrid[row][col].cycleColorIDForward();
+			clicked = 1;
 			repaint();
 		}
 		else{
 			return;
 		}
 	}
-	
+
 	public ArrayList<Coords> getSequence(){
 		Random rand = new Random();
+		int i=0;
+		System.out.println("sequence: xyValues.size:"+xyValues.size() +"  theScore.getLevel():"+theScore.getLevel());
+
 		while (xyValues.size() < theScore.getLevel()){
 			xyValues.add(new Coords(rand.nextInt(3), rand.nextInt(3)));
+			System.out.println("sequence: ("+xyValues.get(i).getX()+", "+xyValues.get(i).getY()+") - i:" + i);
+			System.out.println("  sequence: xyValues.size:"+xyValues.size() +"  theScore.getLevel():"+theScore.getLevel());
+
+			i++;
 		}
 		return xyValues;
 	}
-	
-	
+
+
 	/**
 	 * Here's an example of a simple dialog box with a message.
 	 */
 	public void makeGameOverDialog()
 	{
 		JOptionPane.showMessageDialog(this, "Game Over.");
-		
+
 	}
-	
+
 	//============================ Mouse Listener Overrides ==========================
 
 	@Override
@@ -139,8 +187,8 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 		int col = e.getX()/Cell.CELL_SIZE;
 		int row = e.getY()/Cell.CELL_SIZE;
 		userClickedCell(row,col);
-		
-		
+
+
 	}
 
 	@Override
@@ -149,7 +197,7 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 		// TODO Auto-generated method stub
 		// mouse location is at e.getX() , e.getY().
 		// if you wish to convert to the rows and columns, you can integer-divide by the cell size.
-				
+
 	}
 
 	@Override
@@ -158,7 +206,7 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 		// TODO Auto-generated method stub
 		// mouse location is at e.getX() , e.getY().
 		// if you wish to convert to the rows and columns, you can integer-divide by the cell size.
-		
+
 	}
 
 	@Override
@@ -166,7 +214,7 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	public void mouseEntered(MouseEvent e)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -174,7 +222,7 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	public void mouseExited(MouseEvent e)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 	//============================ Key Listener Overrides ==========================
 
@@ -194,14 +242,14 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	public void keyPressed(KeyEvent e)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 	// ============================= animation stuff ======================================
 	/**
@@ -212,7 +260,7 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 		Thread aniThread = new Thread( new AnimationThread(500)); // the number here is the number of milliseconds between steps.
 		aniThread.start();
 	}
-	
+
 	/**
 	 * Modify this method to do what you want to have happen periodically.
 	 * This method will be called on a regular basis, determined by the delay set in the thread.
@@ -223,32 +271,67 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 	public void animationStep(long millisecondsSinceLastStep)
 	{
 		if(mode == MODE_ANIMATION) {
-			if (j == theScore.getLevel()) {
+			if (flipimage == theScore.getLevel()) {
 				mode = MODE_CLICK;
+				System.out.println("MODE changed to CLICK");
+
 			} else {
-				if (j != (int) j) {
-					Coords currentSquare = xyValues.get((int) j);
-					System.out.println(j);
-					xCoord = currentSquare.getX();
-					yCoord = currentSquare.getY();
-					theGrid[xCoord][yCoord].cycleColorIDBackward();
-					j += .5;
-					repaint();
-				} else {
-					Coords currentSquare = xyValues.get((int) j);
-					System.out.println(j);
-					xCoord = currentSquare.getX();
-					yCoord = currentSquare.getY();
-					theGrid[xCoord][yCoord].cycleColorIDBackward();
-					j += .5;
-					repaint();
-				}
+				Coords currentSquare = xyValues.get((int) flipimage);
+				System.out.println(flipimage);
+				xCoord = currentSquare.getX();
+				yCoord = currentSquare.getY();
+				theGrid[xCoord][yCoord].cycleColorIDBackward();
+				flipimage += .5;
+				repaint();
 			}
 		}
-		else
+		else if (mode == MODE_CLICK)
+		{
+			if (clicked == 1) {
+				mode = MODE_CLICK_FINISH;
+				System.out.println("MODE changed to CLICK FINISH");
+
+			}
+
+			return;
+		}
+		else if (mode == MODE_CLICK_FINISH)
+		{
+			//resetGrid();
+			theGrid[resetxCoord][resetyCoord].cycleColorIDBackward();
+			clicked = 0;
+			repaint();
+			mode = MODE_CLICK;
+			System.out.println("MODE changed to CLICK");
+
+			return;
+		}
+		else if (mode == MODE_FINISHED_SEQUENCE)
+		{
+			System.out.println("MODE changed to MODE_FINISHED_SEQUENCE");
+
+			theGrid[resetxCoord][resetyCoord].cycleColorIDBackward();
+			repaint();
+			mode = MODE_STARTNEXT_SEQUENCE;
+
+			return;
+		}
+		else if (mode == MODE_STARTNEXT_SEQUENCE)
+		{
+			System.out.println("MODE changed to MODE_STARTNEXT_SEQUENCE");
+
+			theGrid[resetxCoord][resetyCoord].cycleColorIDBackward();
+			repaint();
+			mode = MODE_ANIMATION;
+			System.out.println("MODE changed to MODE_ANIMATION");
+
+			return;
+		}
+		else if (mode == MODE_GAME_OVER)
 		{
 			return;
 		}
+
 	}
 	// ------------------------------ animation thread - internal class -------------------
 	public class AnimationThread implements Runnable
@@ -281,8 +364,8 @@ public class GridDemoPanel extends JPanel implements MouseListener, KeyListener
 					break;
 				}
 			}
-			
+
 		}
-		
+
 	}
 }
